@@ -3,13 +3,14 @@ import time
 import csv
 from datetime import datetime
 
-# Set up the serial connection (COM port may vary)
+# change COM port if using on different machine
 ser = Serial.Serial('COM10', 9600, timeout=1)
-time.sleep(2)  # wait for the connection to initialize
+time.sleep(2)
 
-with open('misc/rfid_data.csv', 'w', newline='') as file:
+
+with open('rfid_data.csv', 'w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(['Date', 'Time', 'UID'])
+    writer.writerow(['Date', 'Time', 'UID', 'Check In/Out'])
     while True:
         if ser.in_waiting > 0:
             line = ser.readline().decode('utf-8').rstrip()
