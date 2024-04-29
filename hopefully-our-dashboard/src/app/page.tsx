@@ -14,12 +14,12 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   type jsonStructure = {
-    Date: String;
-    Time: String;
-    UID: String;
+    Date: string;
+    Time: string;
+    UID: string;
+    Check: string;
   };
   const [data, setData] = useState<jsonStructure[]>([]);
-  const [uidStatus, setUidStatus] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,7 +50,7 @@ export default function Home() {
               <TableCell className="font-medium">{item.Date}</TableCell>
               <TableCell>{item.Time}</TableCell>
               <TableCell className="">{item.UID}</TableCell>
-              <TableCell className="">Check In</TableCell>
+              <TableCell className="">{item.Check}</TableCell>
             </TableRow>
           ))}
         </TableBody>
