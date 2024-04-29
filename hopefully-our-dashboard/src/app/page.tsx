@@ -18,6 +18,7 @@ export default function Home() {
     Time: string;
     UID: string;
     Check: string;
+    COM: number;
   };
   const [data, setData] = useState<jsonStructure[]>([]);
 
@@ -38,19 +39,21 @@ export default function Home() {
         <TableCaption>Start the HTTP Server and Run the parser</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-left">Date</TableHead>
+            <TableHead className="">Date</TableHead>
             <TableHead>Time</TableHead>
             <TableHead className="">UID</TableHead>
             <TableHead className="">Check In/Out</TableHead>
+            <TableHead className="">COM Port</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((item, index) => (
             <TableRow key={index}>
-              <TableCell className="font-medium">{item.Date}</TableCell>
-              <TableCell>{item.Time}</TableCell>
+              <TableCell className="">{item.Date}</TableCell>
+              <TableCell className="">{item.Time}</TableCell>
               <TableCell className="">{item.UID}</TableCell>
               <TableCell className="">{item.Check}</TableCell>
+              <TableCell className="">{item.COM}</TableCell>
             </TableRow>
           ))}
         </TableBody>
