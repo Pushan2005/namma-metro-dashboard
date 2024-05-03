@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { CallAPI } from "@/lib/actions";
 import { useEffect, useState } from "react";
 
@@ -22,19 +23,24 @@ export default function Home() {
   };
   const [data, setData] = useState<jsonStructure[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const result = await CallAPI();
-      setData(result);
-      console.log(result);
-    };
-    fetchData();
-    const intervalId = setInterval(fetchData, 1000);
-    return () => clearInterval(intervalId);
-  }, []);
+  const fetchData = async () => {
+    const result = await CallAPI();
+    setData(result);
+    console.log(result);
+  }
+
+  // useEffect(() => {
+  //   fetchData();
+  //   const intervalId = setInterval(fetchData, 1000);
+  //   return () => clearInterval(intervalId);
+  // }, []);
+
 
   return (
     <>
+    <Button onClick={fetchData}>
+      Fetch Data
+    </Button>
       <Table>
         <TableCaption>Start the HTTP Server and Run the parser</TableCaption>
         <TableHeader>
