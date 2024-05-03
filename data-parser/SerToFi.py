@@ -5,7 +5,8 @@ from datetime import datetime
 import threading
 
 # change COM port if using on different machine
-ports = ['COM10', 'COM9', 'COM6']
+ports = ['COM8', 'COM10']
+locations = {'COM8': 'Pattanagere', 'COM10' : "Majestic"}
 sers = [Serial.Serial(port, 9600, timeout=1) for port in ports]
 time.sleep(2)
 
