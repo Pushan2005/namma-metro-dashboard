@@ -21,19 +21,33 @@ export default function Home() {
     Check: string;
     COM: number;
   };
+  type queueStructure = {
+    UID: string;
+    TimeIn: string;
+    TimeOut: string;
+  }
+
   const [data, setData] = useState<jsonStructure[]>([]);
+  const [queue, setQueue] = useState<queueStructure[]>([]);
 
   const fetchData = async () => {
     const result = await CallAPI();
     setData(result);
     console.log(result);
+
+    
+    result.forEach((item: jsonStructure) => {
+      if (!queue.some(i => i.UID === item.UID)) {
+        if (item.Check === "In") {
+          setQueue(oldQueue => [...oldQueue, {UID: item.UID, TimeIn: item.Time, TimeOut: ""}]);
+        }
+        else {
+          setQueue(oldQueue => oldQueue.map(i => i.UID === item.UID ? { ...i, TimeOut: item.Time } : i))
+        }
+      } 
+    });
   }
 
-  // useEffect(() => {
-  //   fetchData();
-  //   const intervalId = setInterval(fetchData, 1000);
-  //   return () => clearInterval(intervalId);
-  // }, []);
 
 
   return (
@@ -64,6 +78,28 @@ export default function Home() {
           ))}
         </TableBody>
       </Table>
+      <div className="">
+        <h1>Queue</h1>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>UID</TableHead>
+              <TableHead>Time In</TableHead>
+              <TableHead>Time Out</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {queue.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>{item.UID}</TableCell>
+                <TableCell>{item.TimeIn}</TableCell>
+                <TableCell>{item.TimeOut}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </>
   );
 }
+
