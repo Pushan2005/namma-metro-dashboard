@@ -9,9 +9,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button";
-import { CallAPI } from "@/lib/actions";
-import { useEffect, useState } from "react";
+import { CallAPI, getDistance } from "@/lib/actions";
+import { getTimeDifference } from "@/lib/utils";
+import { useState } from "react";
+
+import { toast } from "sonner";
+
+
 
 export default function Home() {
   type jsonStructure = {
@@ -29,6 +36,10 @@ export default function Home() {
 
   const [data, setData] = useState<jsonStructure[]>([]);
   const [queue, setQueue] = useState<queueStructure[]>([]);
+  const [selectedUId, setSelectedUId] = useState<queueStructure>();
+  const [metrics, setMetrics] = useState<number[]>();
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
 
   const fetchData = async () => {
     const result = await CallAPI();
@@ -48,14 +59,33 @@ export default function Home() {
     });
   }
 
+  const tableClick = (UID: string, TimeIn: string, TimeOut: string) => {
+    setSelectedUId({UID: UID, TimeIn: TimeIn, TimeOut: TimeOut});
+  }
 
+  const getMetrics = async (source: string, destination: string) => {
+    const noJourneyError = () => {
+      toast("No Journey selected, please select a journey from the list", {
+        description: "Please select a journey from the list to get the metrics",
+      })
+    }
+    const dist = await getDistance(source, destination);
+    if (selectedUId?.TimeOut && selectedUId?.TimeIn) {
+      const timeDifference = getTimeDifference(selectedUId.TimeIn, selectedUId.TimeOut);
+      console.log(selectedUId.TimeIn, selectedUId.TimeOut);
+      setMetrics([dist, timeDifference]);
+    }
+    else {
+      noJourneyError();
+    }
+  }
 
   return (
     <>
     <Button onClick={fetchData}>
       Fetch Data
     </Button>
-      <Table>
+      {/* <Table>
         <TableCaption>Start the HTTP Server and Run the parser</TableCaption>
         <TableHeader>
           <TableRow>
@@ -77,9 +107,8 @@ export default function Home() {
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </Table> */}
       <div className="">
-        <h1>Queue</h1>
         <Table>
           <TableHeader>
             <TableRow>
@@ -90,7 +119,7 @@ export default function Home() {
           </TableHeader>
           <TableBody>
             {queue.map((item, index) => (
-              <TableRow key={index}>
+              <TableRow onClick={() => tableClick(item.UID, item.TimeIn, item.TimeOut)} key={index}>
                 <TableCell>{item.UID}</TableCell>
                 <TableCell>{item.TimeIn}</TableCell>
                 <TableCell>{item.TimeOut}</TableCell>
@@ -99,6 +128,27 @@ export default function Home() {
           </TableBody>
         </Table>
       </div>
+      <br />
+      <h1>Selected Row: --------{selectedUId?.UID}--------{selectedUId?.TimeIn}--------{selectedUId?.TimeOut}</h1>
+      {/* Distance and time saved */}
+      <div className="flex justify-center items-center max-w-56 mt-6 flex-col space-y-5 mx-auto">
+        <Label htmlFor="origin">Origin</Label>
+        <Input id="origin" type="text" placeholder="Coordinates" value={origin} onChange={(e) => setOrigin(e.target.value)}/>
+        <Label htmlFor="destination">Destination</Label>
+        <Input id="destination" type="text" placeholder="Coordinates" value={destination} onChange={(e) => setDestination(e.target.value)}/>
+        <Button onClick={(e) => { getMetrics(origin, destination)}}>
+          Get Metrics
+        </Button>
+        <div>
+          {metrics && (
+            <>
+            <p>Distance: {metrics[0]}</p>
+            <br />
+            <p>Time Saved: {metrics[1]}</p>
+            </>
+          )}
+        </div>
+  </div>
     </>
   );
 }
