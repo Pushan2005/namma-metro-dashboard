@@ -1,5 +1,7 @@
 "use client";
 
+import { Suspense } from "react";
+
 import {
   Table,
   TableBody,
@@ -13,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button";
 import { CallAPI, getDistance } from "@/lib/actions";
-import { getTimeDifference } from "@/lib/utils";
+import { getTimeDifference, getRoadTime } from "@/lib/utils";
 import { useState } from "react";
 
 import { toast } from "sonner";
@@ -71,9 +73,11 @@ export default function Home() {
     }
     const dist = await getDistance(source, destination);
     if (selectedUId?.TimeOut && selectedUId?.TimeIn) {
-      const timeDifference = getTimeDifference(selectedUId.TimeIn, selectedUId.TimeOut);
+      const metroTime = getTimeDifference(selectedUId.TimeIn, selectedUId.TimeOut);
       console.log(selectedUId.TimeIn, selectedUId.TimeOut);
-      setMetrics([dist, timeDifference]);
+      const roadTime = getRoadTime(dist);
+      const timeSaved = getTimeDifference(metroTime, roadTime);
+      setMetrics([dist, metroTime, roadTime, timeSaved]);
     }
     else {
       noJourneyError();
@@ -140,13 +144,20 @@ export default function Home() {
           Get Metrics
         </Button>
         <div>
+          <Suspense fallback={<p>Loading</p>}>
+
           {metrics && (
             <>
-            <p>Distance: {metrics[0]}</p>
-            <br />
-            <p>Time Saved: {metrics[1]}</p>
+              <p>Distance: {metrics[0]}</p>
+              <br />
+              <p>Metro Journey: {metrics[1]}</p>
+              <br />
+              <p>Time on Road: {metrics[2]}</p>
+              <br />
+              <p>Time saved: {metrics[3]}</p>
             </>
           )}
+          </Suspense>
         </div>
   </div>
     </>

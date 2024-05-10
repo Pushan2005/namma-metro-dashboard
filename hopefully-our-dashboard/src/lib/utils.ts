@@ -12,9 +12,16 @@ export function getTimeDifference(timeIn: string, timeOut: string) {
   }
   const timeInSec = toSeconds(timeIn);
   const timeOutSec = toSeconds(timeOut);
-  const diffSec = timeOutSec - timeInSec;
+  const diffSec = (timeOutSec - timeInSec);
   const diffArr = [Math.floor(diffSec / 3600), Math.floor((diffSec % 3600) / 60), diffSec % 60];
   const diff: string = diffArr.map(i => i.toString().padStart(2, "0")).join(":");
   return diff;
   
+}
+
+export function getRoadTime(distance: number) {
+  const timeSec = distance / 16 * 3600;
+  const timeArr = [Math.floor(timeSec / 3600), Math.floor((timeSec % 3600) / 60), timeSec % 60];
+  const time: string = timeArr.map(i => i.toString().padStart(2, "0")).join(":");
+  return time;
 }
