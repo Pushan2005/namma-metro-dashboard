@@ -155,31 +155,34 @@ export default function Home() {
                     {selectedUId?.TimeIn}--------{selectedUId?.TimeOut}
                 </h1>
                 {/* Distance and time saved */}
-                <div className="flex justify-center items-center max-w-56 mt-6 flex-col space-y-5 mx-auto">
-                    <Label htmlFor="origin">Origin</Label>
-                    <Input
-                        id="origin"
-                        type="text"
-                        placeholder="Coordinates"
-                        value={origin}
-                        onChange={(e) => setOrigin(e.target.value)}
-                    />
-                    <Label htmlFor="destination">Destination</Label>
-                    <Input
-                        id="destination"
-                        type="text"
-                        placeholder="Coordinates"
-                        value={destination}
-                        onChange={(e) => setDestination(e.target.value)}
-                    />
-                    <Button
-                        onClick={(e) => {
-                            getMetrics(origin, destination);
-                        }}
-                    >
-                        Get Metrics
-                    </Button>
-                    <div>
+                <div className="flex justify-center items-center max-w-auto mt-6 flex-row space-x-16">
+                    {" "}
+                    <div className="flex justify-center items-center max-w-56 mt-6 flex-col space-y-5">
+                        <Label htmlFor="origin">Origin</Label>
+                        <Input
+                            id="origin"
+                            type="text"
+                            placeholder="Coordinates"
+                            value={origin}
+                            onChange={(e) => setOrigin(e.target.value)}
+                        />
+                        <Label htmlFor="destination">Destination</Label>
+                        <Input
+                            id="destination"
+                            type="text"
+                            placeholder="Coordinates"
+                            value={destination}
+                            onChange={(e) => setDestination(e.target.value)}
+                        />
+                        <Button
+                            onClick={(e) => {
+                                getMetrics(origin, destination);
+                            }}
+                        >
+                            Get Metrics
+                        </Button>
+                    </div>
+                    <div className="output flex flex-col ">
                         {metrics && (
                             <>
                                 <p>Distance: {metrics[0]}</p>

@@ -16,7 +16,7 @@ export function getTimeDifference(timeIn: string, timeOut: string) {
     const diffArr = [
         Math.floor(diffSec / 3600),
         Math.floor((diffSec % 3600) / 60),
-        diffSec % 60,
+        Math.floor(diffSec % 60),
     ];
     const diff: string = diffArr
         .map((i) => i.toString().padStart(2, "0"))
@@ -29,7 +29,7 @@ export function getRoadTime(distance: number) {
     const timeArr = [
         Math.floor(timeSec / 3600),
         Math.floor((timeSec % 3600) / 60),
-        timeSec % 60,
+        Math.floor(timeSec % 60),
     ];
     const time: string = timeArr
         .map((i) => i.toString().padStart(2, "0"))
