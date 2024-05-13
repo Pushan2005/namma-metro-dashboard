@@ -1,41 +1,103 @@
 "use client";
 
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
-import { CallAPI } from "@/lib/actions";
-import { useEffect, useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { CallAPI, getDistance } from "@/lib/actions";
+import { getTimeDifference, getRoadTime } from "@/lib/utils";
+import { useState } from "react";
+
+import { toast } from "sonner";
 
 export default function Home() {
-  type jsonStructure = {
-    Date: string;
-    Time: string;
-    UID: string;
-    Check: string;
-    COM: number;
-  };
-  const [data, setData] = useState<jsonStructure[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const result = await CallAPI();
-      setData(result);
-      console.log(result);
+    type jsonStructure = {
+        Date: string;
+        Time: string;
+        UID: string;
+        Check: string;
+        COM: number;
     };
-    fetchData();
-    const intervalId = setInterval(fetchData, 1000);
-    return () => clearInterval(intervalId);
-  }, []);
+    type queueStructure = {
+        UID: string;
+        TimeIn: string;
+        TimeOut: string;
+    };
 
-  return (
-    <>
-      <Table>
+    const [data, setData] = useState<jsonStructure[]>([]);
+    const [queue, setQueue] = useState<queueStructure[]>([]);
+    const [selectedUId, setSelectedUId] = useState<queueStructure>();
+    const [metrics, setMetrics] = useState<number[]>();
+    const [origin, setOrigin] = useState("");
+    const [destination, setDestination] = useState("");
+
+    const fetchData = async () => {
+        const result = await CallAPI();
+        setData(result);
+        console.log(result);
+
+        result.forEach((item: jsonStructure) => {
+            if (!queue.some((i) => i.UID === item.UID)) {
+                if (item.Check === "In") {
+                    setQueue((oldQueue) => [
+                        ...oldQueue,
+                        { UID: item.UID, TimeIn: item.Time, TimeOut: "" },
+                    ]);
+                } else {
+                    setQueue((oldQueue) =>
+                        oldQueue.map((i) =>
+                            i.UID === item.UID
+                                ? { ...i, TimeOut: item.Time }
+                                : i
+                        )
+                    );
+                }
+            }
+        });
+    };
+
+    const tableClick = (UID: string, TimeIn: string, TimeOut: string) => {
+        setSelectedUId({ UID: UID, TimeIn: TimeIn, TimeOut: TimeOut });
+    };
+
+    const getMetrics = async (source: string, destination: string) => {
+        const noJourneyError = () => {
+            toast(
+                "No Journey selected, please select a journey from the list",
+                {
+                    description:
+                        "Please select a journey from the list to get the metrics",
+                }
+            );
+        };
+        const dist = await getDistance(source, destination);
+        if (selectedUId?.TimeOut && selectedUId?.TimeIn) {
+            const metroTime = getTimeDifference(
+                selectedUId.TimeIn,
+                selectedUId.TimeOut
+            );
+            console.log(selectedUId.TimeIn, selectedUId.TimeOut);
+            const roadTime = getRoadTime(dist);
+            const timeSaved = getTimeDifference(metroTime, roadTime);
+            setMetrics([dist, metroTime, roadTime, timeSaved]);
+        } else {
+            noJourneyError();
+        }
+    };
+
+    return (
+        <>
+            <div className="p-4">
+                <Button onClick={fetchData}>Refresh</Button>
+                {/* <Table>
         <TableCaption>Start the HTTP Server and Run the parser</TableCaption>
         <TableHeader>
           <TableRow>
@@ -57,7 +119,84 @@ export default function Home() {
             </TableRow>
           ))}
         </TableBody>
-      </Table>
-    </>
-  );
+      </Table> */}
+                <div className="">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>UID</TableHead>
+                                <TableHead>Time In</TableHead>
+                                <TableHead>Time Out</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {queue.map((item, index) => (
+                                <TableRow
+                                    onClick={() =>
+                                        tableClick(
+                                            item.UID,
+                                            item.TimeIn,
+                                            item.TimeOut
+                                        )
+                                    }
+                                    key={index}
+                                >
+                                    <TableCell>{item.UID}</TableCell>
+                                    <TableCell>{item.TimeIn}</TableCell>
+                                    <TableCell>{item.TimeOut}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+                <br />
+                <h1>
+                    Selected Row: --------{selectedUId?.UID}--------
+                    {selectedUId?.TimeIn}--------{selectedUId?.TimeOut}
+                </h1>
+                {/* Distance and time saved */}
+                <div className="flex justify-center items-center max-w-auto mt-6 flex-row space-x-16">
+                    {" "}
+                    <div className="flex justify-center items-center max-w-56 mt-6 flex-col space-y-5">
+                        <Label htmlFor="origin">Origin</Label>
+                        <Input
+                            id="origin"
+                            type="text"
+                            placeholder="Coordinates"
+                            value={origin}
+                            onChange={(e) => setOrigin(e.target.value)}
+                        />
+                        <Label htmlFor="destination">Destination</Label>
+                        <Input
+                            id="destination"
+                            type="text"
+                            placeholder="Coordinates"
+                            value={destination}
+                            onChange={(e) => setDestination(e.target.value)}
+                        />
+                        <Button
+                            onClick={(e) => {
+                                getMetrics(origin, destination);
+                            }}
+                        >
+                            Get Metrics
+                        </Button>
+                    </div>
+                    <div className="output flex flex-col ">
+                        {metrics && (
+                            <>
+                                <p>Distance: {metrics[0]}</p>
+                                <br />
+                                <p>Metro Journey: {metrics[1]}</p>
+                                <br />
+                                <p>Time on Road: {metrics[2]}</p>
+                                <br />
+                                <p>Time saved: {metrics[3]}</p>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </>
+    );
 }
