@@ -17,6 +17,7 @@ import { getTimeDifference, getRoadTime } from "@/lib/utils";
 import { useState } from "react";
 
 import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
     type jsonStructure = {
@@ -151,8 +152,9 @@ export default function Home() {
                 </div>
                 <br />
                 <h1>
-                    Selected Row: --------{selectedUId?.UID}--------
-                    {selectedUId?.TimeIn}--------{selectedUId?.TimeOut}
+                    Calculate for: UID: {selectedUId?.UID}--------{">"}
+                    {selectedUId?.TimeIn}---{">"}
+                    {selectedUId?.TimeOut}
                 </h1>
                 {/* Distance and time saved */}
                 <div className="flex justify-center items-center max-w-auto mt-6 flex-row space-x-16">
@@ -182,6 +184,7 @@ export default function Home() {
                             Get Metrics
                         </Button>
                     </div>
+                    <Separator orientation="vertical" />
                     <div className="output flex flex-col ">
                         {metrics && (
                             <>
