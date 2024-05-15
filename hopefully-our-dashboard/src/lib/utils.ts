@@ -36,3 +36,16 @@ export function getRoadTime(distance: number) {
         .join(":");
     return time;
 }
+
+export function getMetroTime(distance: number) {
+    const timeSec = (distance / 35) * 3600;
+    const timeArr = [
+        Math.floor(timeSec / 3600),
+        Math.floor((timeSec % 3600) / 60),
+        Math.floor(timeSec % 60),
+    ];
+    const time: string = timeArr
+        .map((i) => i.toString().padStart(2, "0"))
+        .join(":");
+    return time;
+}
