@@ -13,10 +13,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CallAPI, getDistance } from "@/lib/actions";
-import { getTimeDifference, getRoadTime } from "@/lib/utils";
+import { getTimeDifference, getRoadTime, getMetroTime } from "@/lib/utils";
 import { useState } from "react";
 
 import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
     type jsonStructure = {
@@ -84,10 +85,11 @@ export default function Home() {
                 selectedUId.TimeIn,
                 selectedUId.TimeOut
             );
+            const metroEST = getMetroTime(dist);
             console.log(selectedUId.TimeIn, selectedUId.TimeOut);
             const roadTime = getRoadTime(dist);
-            const timeSaved = getTimeDifference(metroTime, roadTime);
-            setMetrics([dist, metroTime, roadTime, timeSaved]);
+            const timeSaved = getTimeDifference(metroEST, roadTime);
+            setMetrics([dist, metroTime, roadTime, timeSaved, metroEST]);
         } else {
             noJourneyError();
         }
@@ -151,8 +153,9 @@ export default function Home() {
                 </div>
                 <br />
                 <h1>
-                    Selected Row: --------{selectedUId?.UID}--------
-                    {selectedUId?.TimeIn}--------{selectedUId?.TimeOut}
+                    Calculate for: UID: {selectedUId?.UID}--------{">"}
+                    {selectedUId?.TimeIn}---{">"}
+                    {selectedUId?.TimeOut}
                 </h1>
                 {/* Distance and time saved */}
                 <div className="flex justify-center items-center max-w-auto mt-6 flex-row space-x-16">
@@ -182,12 +185,15 @@ export default function Home() {
                             Get Metrics
                         </Button>
                     </div>
+                    <Separator orientation="vertical" />
                     <div className="output flex flex-col ">
                         {metrics && (
                             <>
                                 <p>Distance: {metrics[0]}</p>
                                 <br />
-                                <p>Metro Journey: {metrics[1]}</p>
+                                <p>Your Metro Journey: {metrics[1]}</p>
+                                <br />
+                                <p>Estimated Time on Metro: {metrics[4]} </p>
                                 <br />
                                 <p>Time on Road: {metrics[2]}</p>
                                 <br />
