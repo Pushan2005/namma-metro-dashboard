@@ -6,7 +6,6 @@ import threading
 
 # change COM port if using on different machine
 ports = ['COM8', 'COM10']
-# ports = ['COM8', 'COM10']
 locations = {'COM8': 'Pattanagere', 'COM10' : "Majestic"}
 sers = [Serial.Serial(port, 9600, timeout=1) for port in ports]
 time.sleep(2)

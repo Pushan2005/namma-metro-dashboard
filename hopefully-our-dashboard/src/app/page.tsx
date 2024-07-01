@@ -80,6 +80,7 @@ export default function Home() {
             );
         };
         const dist = await getDistance(source, destination);
+        const distRounded = parseFloat(dist.toFixed(2));
         if (selectedUId?.TimeOut && selectedUId?.TimeIn) {
             const metroTime = getTimeDifference(
                 selectedUId.TimeIn,
@@ -189,7 +190,7 @@ export default function Home() {
                     <div className="output flex flex-col ">
                         {metrics && (
                             <>
-                                <p>Distance: {metrics[0]}</p>
+                                <p>Distance: {metrics[0]} Km</p>
                                 <br />
                                 <p>Your Metro Journey: {metrics[1]}</p>
                                 <br />
